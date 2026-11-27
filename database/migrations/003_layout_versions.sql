@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS layout_versions (id bigserial PRIMARY KEY, lot_id uuid NOT NULL REFERENCES parking_lots(id), version integer NOT NULL, layout jsonb NOT NULL, published_at timestamptz NOT NULL DEFAULT now(), published_by text NOT NULL DEFAULT 'system', UNIQUE(lot_id,version));
+CREATE TABLE IF NOT EXISTS tariff_rules (id bigserial PRIMARY KEY, lot_id uuid NOT NULL REFERENCES parking_lots(id), rule jsonb NOT NULL, active boolean NOT NULL DEFAULT true, created_at timestamptz NOT NULL DEFAULT now());

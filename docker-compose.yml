@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-parkos}
+      POSTGRES_USER: ${POSTGRES_USER:-parkos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    volumes: ["parkos-db:/var/lib/postgresql/data", "./database/migrations:/docker-entrypoint-initdb.d:ro", "./database/seed_default_lot.sql:/docker-entrypoint-initdb.d/099-seed.sql:ro"]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"], interval: 5s, timeout: 3s, retries: 10}
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["parkos-redis:/data"]
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://parkos:change-me@postgres:5432/parkos}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      HMAC_SECRET: ${HMAC_SECRET:-replace-with-a-long-random-secret}
+    ports: ["8000:8000"]
+    depends_on: {postgres: {condition: service_healthy}, redis: {condition: service_started}}
+  frontend:
+    image: node:22-alpine
+    working_dir: /workspace
+    command: sh -c "npm install && npm run start -- --host 0.0.0.0"
+    volumes: ["./frontend:/workspace"]
+    ports: ["5173:5173"]
+    depends_on: [backend]
+  edge-sim:
+    build: ./edge-vision
+    command: ["python", "edge_agent.py"]
+    depends_on: [backend]
+volumes:
+  parkos-db:
+  parkos-redis:

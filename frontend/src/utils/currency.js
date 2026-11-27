@@ -1,0 +1,1 @@
+export const currency = (value, code = 'USD') => new Intl.NumberFormat(undefined, { style: 'currency', currency: code, minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.round((Number(value) || 0) * 100) / 100);
