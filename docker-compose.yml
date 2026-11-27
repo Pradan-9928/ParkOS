@@ -17,6 +17,8 @@ services:
       DATABASE_URL: ${DATABASE_URL:-postgresql://parkos:change-me@postgres:5432/parkos}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       HMAC_SECRET: ${HMAC_SECRET:-replace-with-a-long-random-secret}
+      GATE_MODE: ${GATE_MODE:-manual}
+      ANPR_CONFIDENCE_THRESHOLD: ${ANPR_CONFIDENCE_THRESHOLD:-0.85}
     ports: ["8000:8000"]
     depends_on: {postgres: {condition: service_healthy}, redis: {condition: service_started}}
   frontend:

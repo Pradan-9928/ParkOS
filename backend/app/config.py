@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8080"]
     grace_minutes: int = 10
     hold_seconds: int = 60
+    gate_mode: str = "manual"
+    anpr_confidence_threshold: float = 0.85
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
